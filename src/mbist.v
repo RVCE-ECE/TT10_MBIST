@@ -2,7 +2,7 @@
  * Copyright (c) 2024 Your Name
  * SPDX-License-Identifier: Apache-2.0
  */
-//
+
 `default_nettype none
 module tt_um_mbist (
     input  wire [7:0] ui_in,    // [7]=start, [6]=write_en, [5:4]=mode, [3:0]=data_in
@@ -15,7 +15,7 @@ module tt_um_mbist (
     input  wire       rst_n
 );
 
-    // Parameters
+  // Parameters
     parameter MEM_DEPTH = 16;
     parameter ADDR_WIDTH = 4;
 
