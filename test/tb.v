@@ -22,15 +22,22 @@ module tb ();
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
+ `ifdef GL_TEST
+  wire VPWR = 1'b1;
+  wire VGND = 1'b0;
+`endif
 
-  // Clock generation
-  initial begin
-    clk = 0;
-    forever #5 clk = ~clk; // 100MHz clock
-  end
-
-  // Replace tt_um_mbist with your SRAM BIST module name
+  // Replace tt_um_example with your module name:
   tt_um_mbist user_project (
+
+      // Include power ports for the Gate Level test:
+`ifdef GL_TEST
+      .VPWR(VPWR),
+      .VGND(VGND),
+`endif
+  
+  // Replace tt_um_mbist with your SRAM BIST module name
+
       .ui_in   (ui_in),    // Dedicated inputs
       .uo_out  (uo_out),   // Dedicated outputs
       .uio_in  (uio_in),   // IOs: Input path
@@ -40,6 +47,11 @@ module tb ();
       .clk     (clk),      // clock
       .rst_n   (rst_n)     // not reset
   );
+// Clock generation
+  initial begin
+    clk = 0;
+    forever #5 clk = ~clk; // 100MHz clock
+  end
 
   // Initial values
   initial begin
