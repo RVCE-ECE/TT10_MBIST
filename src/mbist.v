@@ -15,7 +15,7 @@ module tt_um_mbist (
     input  wire       rst_n
 );
 
-  // Parameters
+    // Parameters
     parameter MEM_DEPTH = 16;
     parameter ADDR_WIDTH = 4;
 
