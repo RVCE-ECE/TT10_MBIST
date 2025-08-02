@@ -34,15 +34,17 @@ async def test_project(dut):
     dut.ui_in.value = bist_start | bist_write | bist_mode | (test_data & 0xF)
 
     # Wait for completion (done = bit 7 of uo_out)
-    for _ in range(100):  # timeout protection
+    for cycle in range(100):  # timeout protection
         await ClockCycles(dut.clk, 1)
-        if dut.uo_out.value.integer & 0x80:  # done = bit 7
+        out_binstr = dut.uo_out.value.binstr
+        dut._log.debug(f"[Cycle {cycle}] uo_out = {out_binstr}")
+        if "x" not in out_binstr and int(dut.uo_out.value) & 0x80:
             break
     else:
-        assert False, "Timeout: BIST did not complete"
+        assert False, f"Timeout: BIST did not complete. uo_out={dut.uo_out.value.binstr}"
 
-    # Read uo_out
-    result = dut.uo_out.value.integer
+    # Read uo_out safely
+    result = int(dut.uo_out.value)
     done = (result >> 7) & 1
     fail = (result >> 6) & 1
 
@@ -63,12 +65,16 @@ async def test_project(dut):
     dut.ui_in.value = bist_start | bist_write | bist_mode | (bad_data & 0xF)
 
     # Wait for BIST done
-    for _ in range(100):
+    for cycle in range(100):
         await ClockCycles(dut.clk, 1)
-        if dut.uo_out.value.integer & 0x80:
+        out_binstr = dut.uo_out.value.binstr
+        dut._log.debug(f"[Cycle {cycle}] uo_out = {out_binstr}")
+        if "x" not in out_binstr and int(dut.uo_out.value) & 0x80:
             break
+    else:
+        assert False, f"Timeout: Forced-failure BIST did not complete. uo_out={dut.uo_out.value.binstr}"
 
-    result = dut.uo_out.value.integer
+    result = int(dut.uo_out.value)
     fail = (result >> 6) & 1
     dut._log.info(f"Forced Fail BIST Result: Fail={fail}")
     assert fail == 1, "BIST should have failed but didn't"
